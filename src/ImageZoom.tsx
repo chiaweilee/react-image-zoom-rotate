@@ -19,24 +19,29 @@ export default class ReactImageZoom extends React.PureComponent<ReactImageZoomPr
   private container: any;
   private imageZoom: any;
 
-  public render() {
+  constructor(props: any) {
+    super(props);
+    this.getRef = this.getRef.bind(this)
+  }
+
+  render() {
     return (
-      <div style={this.containerStyle} ref={ref => (this.container = ref)}>
+      <div style={this.containerStyle} ref={this.getRef}>
         {this.props.children}
       </div>
     );
   }
 
-  public componentDidMount() {
+  componentDidMount() {
     this.imageZoom = new ImageZoom(this.container, this.initProps);
   }
 
-  public componentWillUnmount() {
+  componentWillUnmount() {
     this.imageZoom.kill();
     this.imageZoom = void 0;
   }
 
-  public componentDidUpdate(
+  componentDidUpdate(
     prevProps: Readonly<ReactImageZoomProps>,
     prevState: Readonly<{}>,
     snapshot?: any,
@@ -45,6 +50,10 @@ export default class ReactImageZoom extends React.PureComponent<ReactImageZoomPr
       this.imageZoom.kill();
       this.imageZoom = new ImageZoom(this.container, this.initProps);
     }
+  }
+
+  private getRef(ref: any) {
+    this.container = ref;
   }
 
   private get initProps() {

@@ -30,16 +30,16 @@ interface ImageZoomState {
 
 export default class ImageZoom extends React.PureComponent<ImageZoomProps, ImageZoomState> {
   private imageLoader: any;
-  public state: any = {
+  state: any = {
     url: '',
     degree: 0,
   };
 
-  public render() {
+  render() {
     return <ReactImageZoom {...this.reactImageZoomProps}>{this.renderChildren}</ReactImageZoom>;
   }
 
-  public componentDidUpdate(
+  componentDidUpdate(
     prevProps: Readonly<ImageZoomProps>,
     prevState: Readonly<ImageZoomState>,
     snapshot?: any,
