@@ -29,40 +29,6 @@ interface ImageZoomState {
 }
 
 export default class ImageZoom extends React.PureComponent<ImageZoomProps, ImageZoomState> {
-  private imageLoader: any;
-  state: any = {
-    url: '',
-    degree: 0,
-  };
-
-  render() {
-    return <ReactImageZoom {...this.reactImageZoomProps}>{this.renderChildren}</ReactImageZoom>;
-  }
-
-  componentDidUpdate(
-    prevProps: Readonly<ImageZoomProps>,
-    prevState: Readonly<ImageZoomState>,
-    snapshot?: any,
-  ): void {
-    if (!!this.props.rotate) {
-      if (prevProps.src !== this.props.src) {
-        // image changed
-        // reload images
-        delete this.imageLoader;
-        this.loadRotateImage();
-      } else if (prevState.degree !== this.state.degree) {
-        // degree changed
-        if (this.state.degree !== 0) {
-          this.loadRotateImage();
-        } else {
-          // unnecessary to load image degree 0
-          this.setState({
-            url: '',
-          });
-        }
-      }
-    }
-  }
 
   private get renderChildren() {
     if (typeof this.props.rotate === 'function') {
@@ -86,6 +52,45 @@ export default class ImageZoom extends React.PureComponent<ImageZoomProps, Image
       zoomLensStyle: hyphenateCss(Object.assign({}, defaultZoomLensStyle, zoomLensStyle)),
     };
   }
+  state: any = {
+    url: '',
+    degree: 0,
+  };
+  private imageLoader: any;
+
+  render() {
+    return <ReactImageZoom {...this.reactImageZoomProps}>{this.renderChildren}</ReactImageZoom>;
+  }
+
+  componentDidMount(): void {
+    this.loadRotateImage(true);
+  }
+
+  componentDidUpdate(
+    prevProps: Readonly<ImageZoomProps>,
+    prevState: Readonly<ImageZoomState>,
+  ): void {
+    if (!!this.props.rotate) {
+      if (prevProps.src !== this.props.src) {
+        // image changed
+        // reload images
+        delete this.imageLoader;
+        this.setState({ degree: 0 }, () => {
+          this.loadRotateImage(true);
+        });
+      } else if (prevState.degree !== this.state.degree) {
+        // degree changed
+        const ignoreCallback = this.state.degree === 0;
+        this.loadRotateImage(ignoreCallback);
+        if (ignoreCallback) {
+          // unnecessary to load image degree 0
+          this.setState({
+            url: '',
+          });
+        }
+      }
+    }
+  }
 
   private rotateIt(clockwise = false as boolean) {
     this.setState(state => {
@@ -93,7 +98,8 @@ export default class ImageZoom extends React.PureComponent<ImageZoomProps, Image
         return {
           degree: 0,
         };
-      } if (state.degree === 0 && clockwise === false) {
+      }
+      if (state.degree === 0 && clockwise === false) {
         return {
           degree: 270,
         };
@@ -111,7 +117,7 @@ export default class ImageZoom extends React.PureComponent<ImageZoomProps, Image
     });
   }
 
-  private loadRotateImage() {
+  private loadRotateImage(ignoreCallback?: boolean) {
     const { rotate, src } = this.props;
     const { degree } = this.state;
 
@@ -125,10 +131,12 @@ export default class ImageZoom extends React.PureComponent<ImageZoomProps, Image
       this.imageLoader = new ImageLoader(src);
     }
 
-    this.imageLoader.draw(degree, (blobURL: string) => {
-      this.setState({
-        url: blobURL,
+    if (!ignoreCallback) {
+      this.imageLoader.draw(degree, (blobURL: string) => {
+        this.setState({
+          url: blobURL,
+        });
       });
-    });
+    }
   }
 }

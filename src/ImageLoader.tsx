@@ -2,18 +2,28 @@ export default class ImageLoader {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private img: HTMLImageElement;
+  private imgCache: {};
   private src: string;
   private naturalWidth: number;
   private naturalHeight: number;
   private max: number;
   constructor(src: string) {
     this.src = src;
+    this.imgCache = [];
     this.canvas = document.createElement('canvas');
     this.ctx = this.canvas.getContext('2d');
     return this;
   }
 
-  draw(degrees = 0 as number, callback: (blobURL: string) => void) {
+  draw(degrees = 0 as number, callback?: (blobURL: string) => void) {
+    const cache = this.imgCache[degrees];
+    if (typeof cache !== 'undefined') {
+      if (typeof callback === 'function') {
+        callback(cache);
+      }
+      return;
+    }
+
     if (typeof this.img === 'undefined') {
       // not ready, retry after loaded
       this.loadOriginImage(this.src, () => {
@@ -37,14 +47,17 @@ export default class ImageLoader {
     this.canvas.height = height;
     // parse image data
     this.ctx.putImageData(imageData, 0, 0);
+    //  dataURL
+    const base64 = this.canvas.toDataURL();
+    //  blob
+    const blob = this.dataURLtoBlob(base64);
+    //  blobUrl
+    const blobURL = this.blobtoURL(blob);
+    // write cache
+    this.imgCache[degrees] = blobURL;
     // callback
     if (typeof callback === 'function') {
-      //  dataURL
-      const base64 = this.canvas.toDataURL();
-      //  blob
-      const blob = this.dataURLtoBlob(base64);
-      //  blobUrl
-      const blobURL = this.blobtoURL(blob);
+      // callback
       callback(blobURL);
     }
   }
@@ -67,6 +80,7 @@ export default class ImageLoader {
     const width = this.naturalWidth;
     const height = this.naturalHeight;
     const max = this.max;
+    const vertical = width < height;
     switch (degrees) {
       case 90:
         return {
@@ -74,8 +88,8 @@ export default class ImageLoader {
           width: height,
           height: width,
           offset: max / 2,
-          clipX: max - width,
-          clipY: max - height,
+          clipX: !vertical ? max - width : 0,
+          clipY: !vertical ? max - height : 0,
         };
       case 270:
         return {
@@ -83,8 +97,8 @@ export default class ImageLoader {
           width: height,
           height: width,
           offset: max / 2,
-          clipX: 0,
-          clipY: 0,
+          clipX: !vertical ? 0 : max - width,
+          clipY: !vertical ? 0 : 0,
         };
       default:
         return {
