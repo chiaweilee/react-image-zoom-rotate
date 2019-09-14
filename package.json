@@ -9,6 +9,7 @@
     "lint:ts": "tslint \"src/**/*.ts\" \"src/**/*.tsx\" --fix",
     "prestart": "npm run build",
     "start": "umi dev",
+    "docs": "umi build",
     "test": "umi test --coverage",
     "build": "npm run build:babel",
     "build:babel": "npx babel src --out-dir lib --extensions \".tsx\"",
