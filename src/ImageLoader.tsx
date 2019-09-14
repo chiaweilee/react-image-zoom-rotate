@@ -1,15 +1,19 @@
+interface ImgCache {
+  [key: number]: string;
+}
+
 export default class ImageLoader {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private img: HTMLImageElement;
-  private imgCache: {};
+  private imgCache: ImgCache;
   private src: string;
   private naturalWidth: number;
   private naturalHeight: number;
   private max: number;
   constructor(src: string) {
     this.src = src;
-    this.imgCache = [];
+    this.imgCache = {};
     this.canvas = document.createElement('canvas');
     this.ctx = this.canvas.getContext('2d');
     return this;
