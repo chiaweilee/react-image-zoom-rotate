@@ -9,6 +9,10 @@ npm install react-image-zoom-rotate --save
 
 # Usage
 
+```js
+import ImageZoom from 'react-image-zoom-rotate';
+```
+
 ```jsx
 <ImageZoom
         rotate={(clockwise, antiClockwise) => {
