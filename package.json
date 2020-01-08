@@ -1,6 +1,6 @@
 {
   "name": "react-image-zoom-rotate",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "React image zoom and rotate component",
   "scripts": {
     "prepublishOnly": "npm run build",
