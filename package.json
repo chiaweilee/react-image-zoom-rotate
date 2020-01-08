@@ -58,7 +58,6 @@
     "tslint-eslint-rules": "^5.4.0",
     "typescript": "^3.3.3333",
     "umi": "^2.8.8",
-    "umi-plugin-react": "^1.10.0",
     "umi-plugin-types": "^0.3.2"
   },
   "lint-staged": {
