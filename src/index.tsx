@@ -29,6 +29,7 @@ interface ImageZoomState {
 }
 
 export default class ImageZoom extends React.PureComponent<ImageZoomProps, ImageZoomState> {
+
   private get renderChildren() {
     if (typeof this.props.rotate === 'function') {
       return this.props.rotate(this.rotateIt.bind(this, true), this.rotateIt.bind(this, false));
@@ -62,7 +63,7 @@ export default class ImageZoom extends React.PureComponent<ImageZoomProps, Image
   }
 
   componentDidMount(): void {
-    this.loadRotateImage();
+    this.loadRotateImage(true);
   }
 
   componentDidUpdate(
@@ -73,13 +74,20 @@ export default class ImageZoom extends React.PureComponent<ImageZoomProps, Image
       if (prevProps.src !== this.props.src) {
         // image changed
         // reload images
-        this.imageLoader = void 0;
+        delete this.imageLoader;
         this.setState({ degree: 0 }, () => {
-          this.loadRotateImage();
+          this.loadRotateImage(true);
         });
       } else if (prevState.degree !== this.state.degree) {
         // degree changed
-        this.loadRotateImage();
+        const ignoreCallback = this.state.degree === 0;
+        this.loadRotateImage(ignoreCallback);
+        if (ignoreCallback) {
+          // unnecessary to load image degree 0
+          this.setState({
+            url: '',
+          });
+        }
       }
     }
   }
@@ -109,12 +117,13 @@ export default class ImageZoom extends React.PureComponent<ImageZoomProps, Image
     });
   }
 
-  private loadRotateImage() {
+  private loadRotateImage(ignoreCallback?: boolean) {
     const { rotate, src } = this.props;
     const { degree } = this.state;
 
-    if (!rotate) {
+    if (!rotate && !degree) {
       // rotate not allowed
+      // unnecessary to load degree 0
       return;
     }
 
@@ -122,10 +131,12 @@ export default class ImageZoom extends React.PureComponent<ImageZoomProps, Image
       this.imageLoader = new ImageLoader(src);
     }
 
-    this.imageLoader.draw(degree, (blobURL: string) => {
-      this.setState({
-        url: blobURL,
+    if (!ignoreCallback) {
+      this.imageLoader.draw(degree, (blobURL: string) => {
+        this.setState({
+          url: blobURL,
+        });
       });
-    });
+    }
   }
 }

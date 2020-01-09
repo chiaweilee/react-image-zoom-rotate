@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Button } from 'antd';
 import ImageZoom from '../';
 import img1 from '../assets/iu.jpeg';
 import img2 from '../assets/iu2.jpeg';
@@ -24,22 +25,22 @@ export default function() {
 
   return (
     <div className="demo">
-      <button onClick={setIndex} disabled={imgIndex >= imgs.length - 1}>
+      <Button onClick={setIndex} disabled={imgIndex >= imgs.length - 1}>
         next
-      </button>
-      <button onClick={setIndex.bind(null, false)} disabled={imgIndex === 1}>
+      </Button>
+      <Button onClick={setIndex.bind(null, false)} disabled={imgIndex === 1}>
         previous
-      </button>
+      </Button>
       <ImageZoom
         rotate={(clockwise, antiClockwise) => {
           return (
             <div>
-              <button onClick={clockwise} style={{ position: 'absolute', right: 0, zIndex: 1 }}>
+              <Button onClick={clockwise} style={{ position: 'absolute', right: 0, zIndex: 1 }}>
                 clockwise
-              </button>
-              <button onClick={antiClockwise} style={{ position: 'absolute', left: 0, zIndex: 1 }}>
+              </Button>
+              <Button onClick={antiClockwise} style={{ position: 'absolute', left: 0, zIndex: 1 }}>
                 anti-clockwise
-              </button>
+              </Button>
             </div>
           );
         }}
