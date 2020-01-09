@@ -104,7 +104,7 @@ export default class ImageLoader {
           clipX: !vertical ? 0 : max - width,
           clipY: !vertical ? 0 : 0,
         };
-      default:
+      case 180:
         return {
           max,
           width,
@@ -113,6 +113,7 @@ export default class ImageLoader {
           clipX: max - width,
           clipY: max - height,
         };
+      default:
     }
   }
 
